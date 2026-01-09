@@ -1,0 +1,127 @@
+﻿@using Microsoft.AspNetCore.Components
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+    @inject NavigationManager Navigation
+
+    bool isLoading = false;
+
+    async Task Login()
+    {
+        isLoading = true;
+
+        await Task.Delay(3000); // loader
+
+        Navigation.NavigateTo("/dashboard");
+    }
+}
+
+     <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+          <div class="login-card">
+            <div class="login-header">
+              <h2 class="mb-0">Iniciar Sesión</h2>
+              <p class="mb-0 mt-2">Bienvenido de nuevo</p>
+            </div>
+            <div class="login-body">
+              <!-- Loader Overlay -->
+              <div class="loader-overlay" id="loaderOverlay">
+                <div class="spinner"></div>
+                <div class="loader-text">Verificando credenciales...</div>
+              </div>
+              
+              <form id="loginForm" novalidate>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Correo Electrónico</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    placeholder="tu@email.com"
+                    required
+                  />
+                  <span class="invalid-feedback">Ingresa un email válido</span>
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="form-label">Contraseña</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <span class="invalid-feedback">Ingresa una contraseña válida</span>
+                  <small class="form-text text-muted">La contraseña debe contener:</small>
+                  <ul class="small text-muted mt-1">
+                    <li>Mínimo 8 caracteres</li>
+                    <li>Números</li>
+                    <li>Mayúsculas y minúsculas</li>
+                    <li>Un caracter especial (@@, $, !, %, *, ?, &)</li>
+                  </ul>
+                </div>
+                <button type="submit" class="btn btn-primary btn-login w-100" id="submitBtn">
+                  Ingresar
+                </button>
+
+
+                <div class="text-center mt-3">
+                  <a href="#" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+      const $form = $("#loginForm");
+      const emailField = $("#email");
+      const pwdField = $("#password");
+      const $submitBtn = $("#submitBtn");
+      const $loaderOverlay = $("#loaderOverlay");
+
+      $form.on("submit", (e) => {
+        e.preventDefault();
+
+        emailField.removeClass("is-invalid");
+        pwdField.removeClass("is-invalid");
+
+        let isValid = true;
+
+        const email = emailField.val();
+        if (!email.match(/^[a-zA-Z0-9._-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
+          emailField.addClass("is-invalid");
+          isValid = false;
+        }
+
+        const pwd = pwdField.val();
+        if (
+          !pwd.match(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@@$!%*?&])[A-Za-z\d@@$!%*?&]{8,}$/
+          )
+        ) {
+          pwdField.addClass("is-invalid");
+          isValid = false;
+        }
+
+        if (!isValid) {
+          return;
+        }
+
+        $loaderOverlay.addClass("active");
+        $submitBtn.prop("disabled", true);
+
+        setTimeout(() => {
+          const encodedEmail = encodeURIComponent(email);
+        window.location.href = `@Url.Action("Dashboard", "Home")?email=${encodedEmail}`;
+        }, 3000);
+      });
+
+      emailField.on("input", function() {
+        $(this).removeClass("is-invalid");
+      });
+
+      pwdField.on("input", function() {
+        $(this).removeClass("is-invalid");
+      });
+    </script>
